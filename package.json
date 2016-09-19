@@ -4,8 +4,15 @@
   "description": "Learning REST API with Hapi and MongoDB",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --ext js --watch ./ --ignore node_modules server.js",
+    "start": "node server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^0.8.7",
+    "hapi": "^15.0.3",
+    "mongodb": "^2.2.10",
+    "uuid": "^2.0.3"
+  }
 }
