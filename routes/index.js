@@ -1,6 +1,6 @@
 'use strict'
 
-const Api = require('./api')
+const Api = require('../services/api')
 
 module.exports = [
 

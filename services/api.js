@@ -1,6 +1,6 @@
 'use strict'
 
-const Db = require('./db')
+const Db = require('../lib/db')
 const Uuid = require('uuid')
 
 const param = {
