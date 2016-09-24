@@ -26,20 +26,16 @@ function home (req, rep) {
 }
 
 function listUser (req, rep) {
+  const _db = Db.get()
   // const col = db.collection('users')
 
-  Db.connect(url)
-  console.log(req)
-  Db.close()
+  console.log('_db', _db)
+  // console.log(req)
 }
 
 function addUser (req, rep) {
 
-  Db.connect(url)
-  .then(() => {
-    console.log(JSON.stringify(req.payload, null, 2))
-  })
-  .then(Db.close)
+console.log(JSON.stringify(req.payload, null, 2))
 
   // const userId = uuid.v1()
   // const userName = user ||

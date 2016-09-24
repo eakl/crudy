@@ -21,5 +21,6 @@ Db.connect('mongodb://localhost:27017/tw-api')
   })
 })
 .catch((e) => {
-  console.log('Server not launched:',e)
+  console.error(`${e.name}: ${e.message}`)
+  return
 })

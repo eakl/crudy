@@ -166,6 +166,15 @@ To disable the THP warning in the log file `/var/log/mongodb/mongod.log`, issue 
     echo never | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
     ```
 
+  4. **Launch MongoDB at startup (macOS)**
+
+  ```
+  ln -sfv /usr/local/opt/mongodb/*.plist ~/Library/LaunchAgents
+  launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mongodb.plist
+  ```
+
+  Replace `load` by `unload` to disable launching MongoDB at startup 
+
 7. **Uninstall MongoDB**  
 To completely remove MongoDB from a system, you must remove the MongoDB applications themselves, the configuration files, and any directories containing data and logs. The following section guides you through the necessary steps.
 
