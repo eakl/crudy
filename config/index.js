@@ -2,6 +2,10 @@
 
 const Path = require('path')
 
+/*
+* HAPI
+*/
+
 const hapiServer = {
   connections: {
     router: {
@@ -21,8 +25,12 @@ const hapiConnection = {
   port: 8080
 }
 
+/*
+* MONGODB
+*/
+
 // What is native_parser?
-const mongoConfig = {
+const mongoOptions = {
   db: {
     native_parser: true
   },
@@ -31,8 +39,17 @@ const mongoConfig = {
   }
 }
 
+const mongoConnection = {
+  host: 'localhost',
+  port: '27017',
+  db: 'tw-api'
+}
+
+const mongoUrl = `mongodb://${mongoConnection.host}:${mongoConnection.port}/${mongoConnection.db}`
+
 module.exports = {
   hapiServer,
   hapiConnection,
-  mongoConfig
+  mongoOptions,
+  mongoUrl
 }

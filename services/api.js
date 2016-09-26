@@ -1,28 +1,13 @@
 'use strict'
 
-const Db = require('../lib/db')
 const Uuid = require('uuid')
 
-const param = {
-  host: 'localhost',
-  port: '27017',
-  db: 'tw-api'
-}
-
-const url = `mongodb://${param.host}:${param.port}/${param.db}`
+const Db = require('../lib/db2')
+// const _db = Db.get() --> return undefined
+const config = require('../config')
 
 function home (req, rep) {
-  rep(`
-    Welcome to TW API v1.
-    You need to find the magic number by finding the right route
-    API:
-          /listuser       Lists all registered users
-          /adduser        Adds a user
-          /deleteuser     Deletes a user
-          /updateuser     Updates a registered user
-          /query          Query a specific number
-
-`)
+  rep('Welcome to TW API v1.')
 }
 
 function listUser (req, rep) {
@@ -35,7 +20,7 @@ function listUser (req, rep) {
 
 function addUser (req, rep) {
 
-console.log(JSON.stringify(req.payload, null, 2))
+  console.log(JSON.stringify(req.payload, null, 2))
 
   // const userId = uuid.v1()
   // const userName = user ||

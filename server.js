@@ -3,15 +3,15 @@
 const Hapi = require('hapi')
 
 const Db = require('./lib/db')
-const _routes = require('./routes')
-const _config = require('./config')
+const config = require('./config')
+const routes = require('./routes')
 
-const server = new Hapi.Server(_config.hapiServer)
+const server = new Hapi.Server(config.hapiServer)
 
-server.connection(_config.hapiConnection)
-server.route(_routes)
+server.connection(config.hapiConnection)
+server.route(routes)
 
-Db.connect('mongodb://localhost:27017/tw-api')
+Db.connect(config.mongoUrl)
 .then(() => {
   server.start((err) => {
     if (err) {

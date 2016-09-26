@@ -4,6 +4,7 @@ const Api = require('../services/api')
 
 module.exports = [
 
+  // Root
   {
     method: 'GET',
     path: '/',
