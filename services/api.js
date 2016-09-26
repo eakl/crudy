@@ -2,29 +2,56 @@
 
 const Uuid = require('uuid')
 
-const Db = require('../lib/db2')
+const Db = require('../lib/db')
+// const config = require('../config')
+const Util = require('../lib/util')
+const Boom = require('boom')
 // const _db = Db.get() --> return undefined
-const config = require('../config')
 
 function home (req, rep) {
+  req
   rep('Welcome to TW API v1.')
 }
 
 function listUser (req, rep) {
-  const _db = Db.get()
-  // const col = db.collection('users')
+  const data = req.payload
+  const db = Db.get()
+  const col = db.collection('users')
 
-  console.log('_db', _db)
-  // console.log(req)
+  col.find().toArray((err, users) => {
+    if (err) {
+      throw new Error()
+    }
+    const result = users.map((x) => x.user_name)
+    rep(result)
+  })
 }
 
 function addUser (req, rep) {
+  const data = req.payload
+  const db = Db.get()
+  const col = db.collection('users')
 
-  console.log(JSON.stringify(req.payload, null, 2))
+  const userId = Uuid.v1()
+  const userName = data.username
+  const password = data.password ? data.password : Uuid.v4()
 
-  // const userId = uuid.v1()
-  // const userName = user ||
-  // const password = pass ||
+  if (!userName) {
+    const error = Boom.badRequest('A username is required')
+    return rep(error)
+  }
+
+  Util.encrypt(password)
+  .then((hash) => {
+    col.insert({
+      _id: userId,
+      user_name: userName,
+      password: hash,
+      isAdmin: false
+    })
+
+    rep(`User ${userName} added -- Password: ${password}`)
+  })
 }
 //
 // function deleteUser (req, rep) {}

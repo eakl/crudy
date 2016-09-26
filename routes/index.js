@@ -14,14 +14,14 @@ module.exports = [
   // List User
   {
     method: 'GET',
-    path: '/listuser',
+    path: '/user',
     handler: Api.listUser
   },
 
   // Add User
   {
     method: 'POST',
-    path: '/adduser',
+    path: '/user',
     handler: Api.addUser
   }
   //
