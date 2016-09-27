@@ -1,6 +1,7 @@
 'use strict'
 
 const Api = require('../services/api')
+const Schema = require('../schema/adduser')
 
 module.exports = [
 
@@ -22,7 +23,8 @@ module.exports = [
   {
     method: 'POST',
     path: '/user',
-    handler: Api.addUser
+    handler: Api.addUser//,
+    // config: Schema.addUserValidation
   }
   //
   // // Delete User
