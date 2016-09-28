@@ -1,7 +1,7 @@
 'use strict'
 
-const Api = require('../services/api')
-const Schema = require('../schema/adduser')
+const UserService = require('../services/user')
+const UserSchema = require('../schema/user')
 
 module.exports = [
 
@@ -9,38 +9,54 @@ module.exports = [
   {
     method: 'GET',
     path: '/',
-    handler: Api.home
+    handler: UserService.home
   },
 
-  // List User
+  // List All Users
   {
     method: 'GET',
     path: '/user',
-    handler: Api.listUser
+    handler: UserService.listAllUsers
+  },
+
+  // List One User
+  {
+    method: 'GET',
+    path: '/user/{name}',
+    handler: UserService.listUser
   },
 
   // Add User
   {
     method: 'POST',
     path: '/user',
-    handler: Api.addUser//,
-    // config: Schema.addUserValidation
+    handler: UserService.addUser//,
+    // config: {
+    //   validate: {
+    //     payload: UserSchema.addUser
+    //   }
+    // }
+  },
+
+  // Delete User
+  {
+    method: 'DELETE',
+    path: '/user/{name}',
+    handler: UserService.deleteUser//,
+    // config: {
+    //   validate: {
+    //     payload: UserSchema.deleteUser
+    //   }
+    // }
+  },
+
+  // Update User
+  {
+    method: 'GET',
+    path: '/updateuser',
+    handler: UserService.updateUser
   }
-  //
-  // // Delete User
-  // {
-  //   method: 'GET',
-  //   path: '/deleteuser',
-  //   handler:
-  // },
-  //
-  // // Update User
-  // {
-  //   method: 'GET',
-  //   path: '/updateuser',
-  //   handler:
-  // },
-  //
+
   // // Query Number
   // {
   //   method: 'GET',
