@@ -1,7 +1,6 @@
 'use strict'
 
 const UserService = require('../services/user')
-const UserSchema = require('../schema/user')
 
 module.exports = [
 
@@ -30,37 +29,27 @@ module.exports = [
   {
     method: 'POST',
     path: '/user',
-    handler: UserService.addUser//,
-    // config: {
-    //   validate: {
-    //     payload: UserSchema.addUser
-    //   }
-    // }
+    handler: UserService.addUser
   },
 
   // Delete User
   {
     method: 'DELETE',
     path: '/user/{name}',
-    handler: UserService.deleteUser//,
-    // config: {
-    //   validate: {
-    //     payload: UserSchema.deleteUser
-    //   }
-    // }
+    handler: UserService.deleteUser
   },
 
   // Update User
   {
-    method: 'GET',
-    path: '/updateuser',
+    method: 'PATCH',
+    path: '/user/{name}',
     handler: UserService.updateUser
-  }
+  },
 
   // // Query Number
-  // {
-  //   method: 'GET',
-  //   path: '/magic',
-  //   handler:
-  // }
+  {
+    method: 'POST',
+    path: '/{nb}',
+    handler: UserService.query
+  }
 ]

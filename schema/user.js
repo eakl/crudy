@@ -19,8 +19,10 @@ const updateUser = Joi.object().keys({
     pass: Joi.string().required()
   }).required(),
   data: Joi.object().keys({
-    username: Joi.string().insensitive().required(),
-    password: Joi.string().optional()
+    username: Joi.string().insensitive().optional(),
+    password: Joi.string().optional(),
+    isAdmin: Joi.boolean().optional(),
+    lastModified: Joi.date().optional()
   }).required()
 }).required()
 
@@ -31,8 +33,16 @@ const deleteUser = Joi.object().keys({
   }).required()
 }).required()
 
+const query = Joi.object().keys({
+  auth: Joi.object().keys({
+    user: Joi.string().insensitive().required() ,
+    pass: Joi.string().required()
+  }).required()
+}).required()
+
 module.exports = {
   addUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  query
 }
