@@ -11,6 +11,20 @@ module.exports = [
     handler: UserService.home
   },
 
+  // Signup
+  {
+    method: 'POST',
+    path: '/signup',
+    handler: UserService.signup
+  },
+
+  // Login
+  {
+    method: 'GET',
+    path: '/login',
+    handler: UserService.login
+  },
+
   // List All Users
   {
     method: 'GET',
@@ -23,13 +37,6 @@ module.exports = [
     method: 'GET',
     path: '/user/{name}',
     handler: UserService.listUser
-  },
-
-  // Add User
-  {
-    method: 'POST',
-    path: '/user',
-    handler: UserService.addUser
   },
 
   // Delete User

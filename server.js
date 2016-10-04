@@ -3,14 +3,14 @@
 const Hapi = require('hapi')
 
 const Db = require('./lib/db')
-const config = require('./config')
+const Config = require('./config')
 
-Db.connect(config.mongoUrl)
+Db.connect(Config.mongoUrl)
 .then(() => {
   const routes = require('./routes')
 
-  const server = new Hapi.Server(config.hapiServer)
-  server.connection(config.hapiConnection)
+  const server = new Hapi.Server(Config.hapiServer)
+  server.connection(Config.hapiConnection)
   server.route(routes)
 
   server.start((err) => {
