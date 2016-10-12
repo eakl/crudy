@@ -1,5 +1,5 @@
-A simple RESTful CRUD API using Node.js, Hapi, MongoDB and JWT
-==============================================================
+A simple RESTful CRUD API
+=========================
 
 Getting Started
 ---------------
