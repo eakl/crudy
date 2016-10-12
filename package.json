@@ -1,8 +1,8 @@
 {
   "name": "tw-api",
   "version": "1.0.0",
-  "description": "Learning REST API with Hapi and MongoDB",
-  "main": "index.js",
+  "description": "A simple RESTful CRUD API using Node.js, Hapi, MongoDB and JWT",
+  "main": "server.js",
   "scripts": {
     "dev": "nodemon --ext js --watch ./ --ignore node_modules server.js",
     "start": "node server.js"
@@ -20,5 +20,8 @@
     "moment": "^2.15.1",
     "mongodb": "^2.2.10",
     "uuid": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }

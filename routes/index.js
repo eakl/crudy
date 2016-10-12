@@ -51,12 +51,5 @@ module.exports = [
     method: 'PATCH',
     path: '/user/{name}',
     handler: UserService.updateUser
-  },
-
-  // // Query Number
-  {
-    method: 'POST',
-    path: '/{nb}',
-    handler: UserService.query
   }
 ]

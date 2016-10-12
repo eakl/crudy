@@ -14,9 +14,13 @@ const db = Db.get()
 const userCol = db.collection('users')
 
 function home (req, rep) {
-  const msg = 'Welcome to TW API v1.'
-  console.log('Home -- ', msg)
-  rep(msg).code(200)
+  const response = {
+    message: 'Welcome to TW API v1.'
+  }
+
+  console.log('Home --', response.message)
+
+  rep(`${response}\n`).code(200)
 }
 
 function signup (req, rep) {
@@ -28,7 +32,7 @@ function signup (req, rep) {
         const error = 'Invalid request payload JSON format: ' + isValidPayload.errorMsg
         console.log('Bad Request: ', error)
         const httpError = Boom.badRequest(error)
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const userId = Uuid.v1()
@@ -40,7 +44,7 @@ function signup (req, rep) {
       if (userExists) {
         console.log('Conflict: The user already exists')
         const httpError = Boom.conflict('The user already exists')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const hash = yield Util.hash(password)
@@ -54,17 +58,20 @@ function signup (req, rep) {
 
       yield userCol.insert(user)
 
-      console.log(`${username} added to the user base`)
-      console.log('-----------')
-      console.log(`Username: ${username}`)
-      console.log(`Password: ${password}`)
+      let response = {
+        message: `User added to the user base`,
+        username: `${username}`,
+        password: `${password}`
+      }
 
-      return rep(`
-        ${username}, you have been added to the user base
-        -----------
-        Username: ${username}
-        Password: ${password}
-        `).code(201)
+      console.log(response.message)
+      console.log('-----------')
+      console.log(`Username: ${response.username}`)
+      console.log(`Password: ${response.password}`)
+
+      response = JSON.stringify(response, null, 2)
+
+      return rep(`${response}\n`).code(201)
     }
     catch(e) {
       throw e
@@ -79,14 +86,22 @@ function login (req, rep) {
 
       if (auth.httpError && auth.httpError.isBoom) {
         console.log(auth.error)
-        return rep(auth.httpError)
+        return rep(`${auth.httpError}\n`)
       }
 
-      console.log(`Token for user: ${auth.username}`)
-      console.log('---------------')
-      console.log(`Access Token: ${auth.token}`)
+      let response = {
+        message: `Login successful`,
+        username: `${auth.username}`,
+        token: `${auth.token}`
+      }
 
-      return rep(auth.token).code(201)
+      console.log(response.message)
+      console.log('---------------')
+      console.log(`Access Token: ${response.token}`)
+
+      response = JSON.stringify(response, null, 2)
+
+      return rep(`${response}\n`).code(201)
     }
     catch(e) {
       throw e
@@ -103,17 +118,24 @@ function listAllUsers (req, rep) {
       if (!token.isValid) {
         console.log('Unauthorized: Wrong credentials')
         const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const users = yield userCol.find({}).toArray()
-      const usersname = users.map((x) => x.username)
+      const userlist = users.map((x) => x.username)
 
-      console.log('List of all users:')
+      let response = {
+        message: `List all users present in the database`,
+        users: userlist
+      }
+
+      console.log(response.message)
       console.log('------------------')
-      console.log(usersname)
+      console.log(response.users)
 
-      return rep(usersname).code(200)
+      response = JSON.stringify(response, null, 2)
+
+      return rep(`${response}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -130,7 +152,7 @@ function listUser (req, rep) {
       if (!token.isValid) {
         console.log('Unauthorized: Wrong credentials')
         const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const username = req.params.name.toLowerCase()
@@ -139,16 +161,23 @@ function listUser (req, rep) {
       if (!user) {
         console.log('Not Found: The user does not exist')
         const httpError = Boom.notFound('The user does not exist')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       user.password = '************'
 
-      console.log(username)
-      console.log('-------')
-      console.log(user)
+      let response = {
+        message: `User information`,
+        user
+      }
 
-      return rep(user).code(200)
+      console.log(response.message)
+      console.log('-------')
+      console.log(response.user)
+
+      response = JSON.stringify(response, null, 2)
+
+      return rep(`${response}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -163,7 +192,7 @@ function deleteUser (req, rep) {
 
       if (token.httpError && token.httpError.isBoom) {
         console.log(token.error)
-        return rep(token.httpError)
+        return rep(`${token.httpError}\n`)
       }
 
       let hasRight = token.scope ? token.scope.indexOf('admin') !== -1 : null
@@ -171,7 +200,7 @@ function deleteUser (req, rep) {
       if (!token.isValid) {
         console.log('Unauthorized: Wrong credentials')
         const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const username = req.params.name.toLowerCase()
@@ -180,7 +209,7 @@ function deleteUser (req, rep) {
       if (!hasRight) { // try res.authUser to throw an exception. Doesn't work properly
         console.log('Forbidden: You don\'t have the privileges for this operation')
         const httpError = Boom.forbidden('You don\'t have the privileges for this operation')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       // const user = yield userCol.findOne({ username: username })
@@ -191,14 +220,21 @@ function deleteUser (req, rep) {
       if (result.ok !== 1) {
         console.log('Not Found: The user does not exist')
         const httpError = Boom.notFound('The user does not exist')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
-      console.log('User deleted')
-      console.log('------------')
-      console.log(username)
+      let response = {
+        message: `User deleted`,
+        user: username
+      }
 
-      return rep(username).code(200)
+      console.log(response.message)
+      console.log('------------')
+      console.log(response.user)
+
+      response = JSON.stringify(response, null, 2)
+
+      return rep(`${response}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -215,14 +251,14 @@ function updateUser (req, rep) {
         const error = 'Invalid request payload JSON format: ' + isValidPayload.errorMsg
         console.log('Bad Request: ', error)
         const httpError = Boom.badRequest(error)
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const token = yield Auth.verifyToken(req, userCol)
 
       if (token.httpError && token.httpError.isBoom) {
         console.log(token.error)
-        return rep(token.httpError)
+        return rep(`${token.httpError}\n`)
       }
 
       const isAdmin = token.scope ? token.scope.indexOf('admin') !== -1 : false
@@ -230,7 +266,7 @@ function updateUser (req, rep) {
       if (!token.isValid) {
         console.log('Unauthorized: Wrong credentials')
         const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const username = req.params.name.toLowerCase()
@@ -239,7 +275,7 @@ function updateUser (req, rep) {
       if (!hasRight) {
         console.log('Forbidden: You don\'t have the privileges for this operation')
         const httpError = Boom.forbidden('You don\'t have the privileges for this operation')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       const data = req.payload
@@ -253,14 +289,14 @@ function updateUser (req, rep) {
       if(!hasChanged) {
         console.log('Unprocessable Entity: Nothing to update')
         const httpError = Boom.badData('Nothing to update')
-        return rep(httpError)
+        return rep(`${httpError}\n`)
       }
 
       if (updatedAdmin) {
         if(!isAdmin) {
           console.log('Forbidden: You want to be admin? :D')
           const httpError = Boom.forbidden('You want to be admin? :D')
-          return rep(httpError)
+          return rep(`${httpError}\n`)
         }
         obj.isAdmin = data.isAdmin
         obj._id = Uuid.v1()
@@ -272,44 +308,24 @@ function updateUser (req, rep) {
         })
 
       const updatedUser = Object.assign({}, result.value, obj)
-      console.log(updatedUser)
 
+      let response = {
+        message: `User updated`,
+        user: updatedUser,
+        delta: obj
+      }
 
-      console.log('User updated')
+      console.log(response.message)
       console.log('------------')
-      console.log(updatedUser)
+      console.log(response.user)
       console.log(' ')
       console.log('Delta')
       console.log('------------')
-      console.log(obj)
+      console.log(response.obj)
 
-      return rep(updatedUser).code(200)
-    }
-    catch(e) {
-      throw e
-    }
-  }))()
-}
+      response = JSON.stringify(response, null, 2)
 
-function query (req, rep) {
-  (P.coroutine(function* () {
-    try {
-      const token = yield Auth.verifyToken(req, userCol)
-
-      if (!token.isValid) {
-        console.log('Unauthorized: Wrong credentials')
-        const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(httpError)
-      }
-
-      const magic = req.params.nb
-
-      if (Number(magic) === 42) {
-        console.log('You got the magic number:', magic)
-        return rep('You got the magic number: ' + magic).code(200)
-      }
-
-      return rep('Try again bro').code(200)
+      return rep(`${response}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -324,6 +340,5 @@ module.exports = {
   listAllUsers,
   listUser,
   deleteUser,
-  updateUser,
-  query
+  updateUser
 }
