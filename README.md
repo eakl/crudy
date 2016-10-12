@@ -1,203 +1,189 @@
-# Install mongoDB
+A simple RESTful CRUD API using Node.js, Hapi, MongoDB and JWT
+==============================================================
 
-1. **Import the public key used by the package management system**  
-The Ubuntu package management tools (i.e. dpkg and apt) ensure package consistency and authenticity by requiring that distributors sign packages with GPG keys. Issue the following command to import the MongoDB public GPG Key:
+Getting Started
+---------------
 
-  ```
-  sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-  ```
+## Prerequisite
 
-2. **Create a list file for MongoDB**  
-Create the `/etc/apt/sources.list.d/mongodb-org-3.2.list` list file using the command appropriate for your version of Ubuntu:
+Before running the TW-API make sure that:
+- You have **MongoDB** installed on your machine
+- You have **Python 2.x**
 
-  ```
-  echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
-  ```
+**NOTE:** `bcrypt` uses `node-gyp` as a dependency which in turn requires Python 2.x to build.
 
-3. **Reload local package database.**  
-Issue the following command to reload the local package database:
+If you use Python 3.x by default, you must install **Python 2.x** in parallel and configure NPM to point towards the `python2` binary.
 
-  ```
-  sudo apt-get update
-  ```
+After having cloned the repo, you can either pass the `--python` option to `npm install`:
 
-4. **Install the MongoDB packages**  
-Install the latest stable version of MongoDB.
-
-  ```
-  sudo apt-get install -y mongodb-org
-  ```
-
-5. **(Ubuntu 16.04-only) Create systemd service file**  
-
-  > Follow this step ONLY if you are running Ubuntu 16.04
-
-  Create a new file at **/lib/systemd/system/mongod.service** with the following contents:
-
-  ```
-  [Unit]
-  Description=High-performance, schema-free document-oriented database
-  After=network.target
-  Documentation=https://docs.mongodb.org/manual
-
-  [Service]
-  User=mongodb
-  Group=mongodb
-  ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf
-
-  [Install]
-  WantedBy=multi-user.target
-  ```
-
-6. **Run MongoDB Community Edition**  
-The MongoDB instance stores its data files in `/var/lib/mongodb` and its log files in `/var/log/mongodb` by default, and runs using the mongodb user account. You can specify alternate log and data file directories in `/etc/mongod.conf`. See **systemLog.path** and **storage.dbPath** for additional information. [Configuration Options](https://docs.mongodb.com/manual/reference/configuration-options/)
-
-  If you change the user that runs the MongoDB process, you must modify the access control rights to the `/var/lib/mongodb` and `/var/log/mongodb` directories to give this user access to these directories.
-
-#### mongod.conf template
-
-```
-# mongod.conf
-
-# for documentation of all options, see:
-# http://docs.mongodb.org/manual/reference/configuration-options/
-
-# Where and how to store data.
-storage:
-  dbPath: /data/mongodb
-  journal:
-    enabled: true
-
-#  engine:
-#  mmapv1:
-#  wiredTiger:
-
-# where to write logging data.
-systemLog:
-  destination: file
-  logAppend: true
-  path: /var/log/mongodb/mongod.log
-
-# network interfaces
-net:
-  port: 27017
-  bindIp: 127.0.0.1
-
-#processManagement:
-
-#security:
-
-#operationProfiling:
-
-#replication:
-
-#sharding:
-
-## Enterprise-Only Options:
-
-#auditLog:
-
-#snmp:
+```bash
+npm install --python /path/to/python2.7
 ```
 
-# Use MongoDB
+or configure NPM to use the `python2` binary:
 
-1. **Start MongoDB**  
-Issue the following command to start mongod:
+```bash
+npm config set python /path/to/python2.7
+```
 
-  ```
-  sudo service mongod start
-  ```
+## Installation
 
-2. **Check MongoDB status**  
-Issue the following command to start mongod:
+```bash
+# Clone the repo
+git clone https://github.com/eakl/tw-api
+cd tw-api
 
-  ```
-  sudo service mongod status
-  ```
+# Install dependencies
+npm install
 
-3. **Verify that MongoDB has started successfully**  
-Verify that the mongod process has started successfully by checking the contents of the log file at `/var/log/mongodb/mongod.log` for a line reading
+# Start the server
+npm start
+```
 
-  ```
-  cat /var/log/mongodb/mongod.log
-  ```
+## Usage
 
-  ```
-  [initandlisten] waiting for connections on port <port>
-  ```
+Once the server has started, you can use this simple API with [cURL](https://curl.haxx.se/docs/httpscripting.html) or [Postman](https://www.getpostman.com/)
 
-  where **<port>** is the port configured in `/etc/mongod.conf`, **27017** by default.
+### Home
 
-4. **Stop MongoDB**  
-As needed, you can stop the mongod process by issuing the following command:
+```bash
+curl http://localhost:8080/
+```
 
-  ```
-  sudo service mongod stop
-  ```
+Returns:
 
-5. **Restart MongoDB**  
-Issue the following command to restart mongod:
+```
+Welcome to TW API v1.
+```
 
-  ```
-  sudo service mongod restart
-  ```
+### Signup
 
-6. **Disable Transparent Huge Pages (THP) warning**  
-To disable the THP warning in the log file `/var/log/mongodb/mongod.log`, issue the following commands:
+Adds a user to the database.  
+Choose *YOUR_USERNAME* and *YOUR_PASSWORD*.  
 
-  1. **Check the status of the files by echoing them:**
 
-    ```
-    cat /sys/kernel/mm/transparent_hugepage/defrag
-    cat /sys/kernel/mm/transparent_hugepage/enabled
-    ```
+```bash
+curl http://localhost:8080/signup \
+-X POST \
+-H "Content-Type:application/json" \
+-d '{"username":"YOUR_USERNAME", "password": "YOUR_PASSWORD"}'
+```
 
-  2. **Remove the log file by issuing the following command:**
+Returns:
 
-    ```
-    sudo rm /var/log/mongodb/mongod.log
-    ```
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "username": YOUR_USERNAME,
+  "password": YOUR_PASSWORD
+}
+```
 
-  3. **Disable the THP**
+### Login
 
-    ```
-    echo never | sudo tee /sys/kernel/mm/transparent_hugepage/defrag
-    echo never | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
-    ```
+Gets an access token for a given registered user.  
+Replace *YOUR_USERNAME* and *YOUR_PASSWORD*.
 
-  4. **Launch MongoDB at startup (macOS)**
+```bash
+curl http://localhost:8080/login \
+-X GET \
+-u YOUR_USERNAME:YOUR_PASSWORD
+```
 
-  ```
-  ln -sfv /usr/local/opt/mongodb/*.plist ~/Library/LaunchAgents
-  launchctl load ~/Library/LaunchAgents/homebrew.mxcl.mongodb.plist
-  ```
+Returns:
 
-  Replace `load` by `unload` to disable launching MongoDB at startup 
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "username": YOUR_USERNAME,
+  "token": ACCESS_TOKEN
+}
+```
 
-7. **Uninstall MongoDB**  
-To completely remove MongoDB from a system, you must remove the MongoDB applications themselves, the configuration files, and any directories containing data and logs. The following section guides you through the necessary steps.
+### List all the users
 
-  > This process will completely remove MongoDB, its configuration, and all databases. This process is not reversible, so ensure that all of your configuration and data is backed up before proceeding.
+Lists all the users registered in the database.  
+Replace *ACCESS_TOKEN*.
 
-  1. **Stop MongoDB**  
-  Stop the mongod process by issuing the following command:
+```bash
+curl http://localhost:8080/user \
+-X GET \
+-H "Authorization: ACCESS_TOKEN"
+```
 
-    ```
-    sudo service mongod stop
-    ```
+Returns:
 
-  2. **Remove Packages**  
-  Remove any MongoDB packages that you had previously installed.
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "users": EXISTING_USERS
+}
+```
 
-    ```
-    sudo apt-get --purge autoremove mongodb-org*
-    ```
+### Get information about a user
 
-  3. **Remove Data Directories**  
-  Remove MongoDB databases and log files.
+Gets the information about a given user.  
+Replace *USER* and *ACCESS_TOKEN*
 
-    ```
-    sudo rm -r /var/log/mongodb (or <path_to_log_file>)
-    sudo rm -r /var/lib/mongodb (or <path_to_data_file>)
-    ```
+```bash
+curl http://localhost:8080/user/USER \
+-X GET \
+-H "Authorization: ACCESS_TOKEN"
+```
+
+Returns:
+
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "user": USER_INFO
+}
+```
+
+### Delete a user
+
+Deletes a user. You can only delete yourself if you're not admin.  
+Replace *USER* and *ACCESS_TOKEN*
+
+```bash
+curl http://localhost:8080/user/USER \
+-X DELETE \
+-H "Authorization: ACCESS_TOKEN"
+```
+
+Returns:
+
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "user": DELETED_INFO
+}
+```
+
+### Update a user information
+
+Updates the information of a given user. You can only update your information if you're not admin.  
+Replace *USER*, *ACCESS_TOKEN* and the KEY/VALUE pairs you want to update.
+
+Available updates:
+- `username` -- change the username of a user
+- `password` -- change the password of a user
+- `isAdmin` -- change the right of a user (only admins have access to this command)
+
+```bash
+curl http://localhost:8080/user/USER \
+-X PATCH \
+-H "Authorization: ACCESS_TOKEN" \
+-H "Content-Type:application/json" \
+-d '{"KEY_TO_UPDATE": "VALUE_TO_UPDATE"}'
+```
+
+Returns:
+
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "user": UPDATED_USER_INFO,
+  "delta": DELTA
+}
+```
