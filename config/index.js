@@ -47,9 +47,28 @@ const mongoConnection = {
 
 const mongoUrl = `mongodb://${mongoConnection.host}:${mongoConnection.port}/${mongoConnection.db}`
 
+const mongoCollection = {
+  signup: 'users',
+  login: 'users',
+  listAllUsers: 'users',
+  listUser: 'users',
+  updateUser: 'users',
+  deleteUser: 'users',
+  parseCredentials: 'users',
+  parseToken: 'users'
+}
+
+/*
+* API
+*/
+
+const apiKey = 'secretkey'
+
 module.exports = {
   hapiServer,
   hapiConnection,
   mongoOptions,
-  mongoUrl
+  mongoUrl,
+  mongoCollection,
+  apiKey
 }

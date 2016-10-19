@@ -1,6 +1,9 @@
 'use strict'
 
 const UserService = require('../services/user')
+const UserSchema = require('../schema/user')
+const ValidationErrorMiddleware = require('../middleware/validation')
+const AuthMiddleware = require('../middleware/auth')
 
 module.exports = [
 
@@ -15,6 +18,12 @@ module.exports = [
   {
     method: 'POST',
     path: '/signup',
+    config: {
+      validate: {
+        payload: UserSchema.signup,
+        failAction: ValidationErrorMiddleware.formatError
+      }
+    },
     handler: UserService.signup
   },
 
@@ -22,6 +31,9 @@ module.exports = [
   {
     method: 'GET',
     path: '/login',
+    config: {
+      pre: [ AuthMiddleware.verifyCredentials ]
+    },
     handler: UserService.login
   },
 
@@ -29,6 +41,9 @@ module.exports = [
   {
     method: 'GET',
     path: '/user',
+    config: {
+      pre: [ AuthMiddleware.verifyToken ]
+    },
     handler: UserService.listAllUsers
   },
 
@@ -36,20 +51,33 @@ module.exports = [
   {
     method: 'GET',
     path: '/user/{name}',
+    config: {
+      pre: [ AuthMiddleware.verifyToken ]
+    },
     handler: UserService.listUser
-  },
-
-  // Delete User
-  {
-    method: 'DELETE',
-    path: '/user/{name}',
-    handler: UserService.deleteUser
   },
 
   // Update User
   {
     method: 'PATCH',
     path: '/user/{name}',
+    config: {
+      validate: {
+        payload: UserSchema.updateUser,
+        failAction: ValidationErrorMiddleware.formatError
+      },
+      pre: [ AuthMiddleware.verifyToken ]
+    },
     handler: UserService.updateUser
+  },
+
+  // Delete User
+  {
+    method: 'DELETE',
+    path: '/user/{name}',
+    config: {
+      pre: [ AuthMiddleware.verifyToken ]
+    },
+    handler: UserService.deleteUser
   }
 ]

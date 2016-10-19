@@ -6,59 +6,52 @@ const Uuid = require('uuid')
 const Boom = require('boom')
 
 const Db = require('../lib/db')
-const Auth = require('../lib/auth')
+const Auth = require('../middleware/auth')
 const Util = require('../lib/util')
+const Col = require('../config').mongoCollection
 const UserSchema = require('../schema/user')
 
 const db = Db.get()
-const userCol = db.collection('users')
 
-function home (req, rep) {
+function home (request, reply) {
   const response = {
     message: 'Welcome to TW API v1.'
   }
 
   console.log('Home --', response.message)
 
-  rep(`${response}\n`).code(200)
+  reply(`${JSON.stringify(response, null, 2)}\n`).code(200)
 }
 
-function signup (req, rep) {
+function signup (request, reply) {
   (P.coroutine(function* () {
     try {
-      const isValidPayload = Util.validateSchema(req.payload, UserSchema.signup)
+      const dbCol = db.collection(Col.signup)
+      let { username, password } = request.payload
+      username = username.toLowerCase()
 
-      if (isValidPayload.error) {
-        const error = 'Invalid request payload JSON format: ' + isValidPayload.errorMsg
-        console.log('Bad Request: ', error)
-        const httpError = Boom.badRequest(error)
-        return rep(`${httpError}\n`)
-      }
+      // const userId = Uuid.v1()
+      // const username = req.payload.username.toLowerCase()
+      // const password = req.payload.password
 
-      const userId = Uuid.v1()
-      const username = req.payload.username.toLowerCase()
-      const password = req.payload.password
-
-      const userExists = yield userCol.findOne({ username: username })
+      const userExists = yield dbCol.findOne({ username: username })
 
       if (userExists) {
-        console.log('Conflict: The user already exists')
-        const httpError = Boom.conflict('The user already exists')
-        return rep(`${httpError}\n`)
+        return reply(`${Util.error('conflict')('The user already exists')}\n`)
       }
 
       const hash = yield Util.hash(password)
 
       const user = {
-        _id: userId,
+        _id: Uuid.v1(), //userId,
         username: username,
         password: hash,
         isAdmin: false
       }
 
-      yield userCol.insert(user)
+      yield dbCol.insert(user)
 
-      let response = {
+      const response = {
         message: `User added to the user base`,
         username: `${username}`,
         password: `${password}`
@@ -69,9 +62,7 @@ function signup (req, rep) {
       console.log(`Username: ${response.username}`)
       console.log(`Password: ${response.password}`)
 
-      response = JSON.stringify(response, null, 2)
-
-      return rep(`${response}\n`).code(201)
+      return reply(`${JSON.stringify(response, null, 2)}\n`).code(201)
     }
     catch(e) {
       throw e
@@ -79,17 +70,12 @@ function signup (req, rep) {
   }))()
 }
 
-function login (req, rep) {
+function login (request, reply) {
   (P.coroutine(function* () {
     try {
-      const auth = yield Auth.verifyCreds(req, userCol)
+      const auth = request.pre.auth
 
-      if (auth.httpError && auth.httpError.isBoom) {
-        console.log(auth.error)
-        return rep(`${auth.httpError}\n`)
-      }
-
-      let response = {
+      const response = {
         message: `Login successful`,
         username: `${auth.username}`,
         token: `${auth.token}`
@@ -99,9 +85,7 @@ function login (req, rep) {
       console.log('---------------')
       console.log(`Access Token: ${response.token}`)
 
-      response = JSON.stringify(response, null, 2)
-
-      return rep(`${response}\n`).code(201)
+      return reply(`${JSON.stringify(response, null, 2)}\n`).code(201)
     }
     catch(e) {
       throw e
@@ -109,22 +93,15 @@ function login (req, rep) {
   }))()
 }
 
-
-function listAllUsers (req, rep) {
+function listAllUsers (request, reply) {
   (P.coroutine(function* () {
     try {
-      const token = yield Auth.verifyToken(req, userCol)
+      const dbCol = db.collection(Col.listAllUsers)
 
-      if (!token.isValid) {
-        console.log('Unauthorized: Wrong credentials')
-        const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(`${httpError}\n`)
-      }
-
-      const users = yield userCol.find({}).toArray()
+      const users = yield dbCol.find({}).toArray()
       const userlist = users.map((x) => x.username)
 
-      let response = {
+      const response = {
         message: `List all users present in the database`,
         users: userlist
       }
@@ -133,9 +110,7 @@ function listAllUsers (req, rep) {
       console.log('------------------')
       console.log(response.users)
 
-      response = JSON.stringify(response, null, 2)
-
-      return rep(`${response}\n`).code(200)
+      return reply(`${JSON.stringify(response, null, 2)}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -143,30 +118,21 @@ function listAllUsers (req, rep) {
   }))()
 }
 
-// Unhandled rejection when error. Try catch doesn't work ??
-function listUser (req, rep) {
+function listUser (request, reply) {
   (P.coroutine(function* () {
     try {
-      const token = yield Auth.verifyToken(req, userCol)
+      const dbCol = db.collection(Col.listUser)
 
-      if (!token.isValid) {
-        console.log('Unauthorized: Wrong credentials')
-        const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(`${httpError}\n`)
-      }
-
-      const username = req.params.name.toLowerCase()
-      const user = yield userCol.findOne({ username: username })
+      const username = request.params.name.toLowerCase()
+      const user = yield dbCol.findOne({ username: username })
 
       if (!user) {
-        console.log('Not Found: The user does not exist')
-        const httpError = Boom.notFound('The user does not exist')
-        return rep(`${httpError}\n`)
+        return reply(`${Util.error('notFound')('The user does not exist')}\n`)
       }
 
       user.password = '************'
 
-      let response = {
+      const response = {
         message: `User information`,
         user
       }
@@ -175,9 +141,7 @@ function listUser (req, rep) {
       console.log('-------')
       console.log(response.user)
 
-      response = JSON.stringify(response, null, 2)
-
-      return rep(`${response}\n`).code(200)
+      return reply(`${JSON.stringify(response, null, 2)}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -185,100 +149,21 @@ function listUser (req, rep) {
   }))()
 }
 
-function deleteUser (req, rep) {
+function updateUser (request, reply) {
   (P.coroutine(function* () {
     try {
-      const token = yield Auth.verifyToken(req, userCol)
+      const dbCol = db.collection(Col.updateUser)
+      const auth = request.pre.auth
 
-      if (token.httpError && token.httpError.isBoom) {
-        console.log(token.error)
-        return rep(`${token.httpError}\n`)
-      }
-
-      let hasRight = token.scope ? token.scope.indexOf('admin') !== -1 : null
-
-      if (!token.isValid) {
-        console.log('Unauthorized: Wrong credentials')
-        const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(`${httpError}\n`)
-      }
-
-      const username = req.params.name.toLowerCase()
-      hasRight = hasRight || (username === token.username)
-
-      if (!hasRight) { // try res.authUser to throw an exception. Doesn't work properly
-        console.log('Forbidden: You don\'t have the privileges for this operation')
-        const httpError = Boom.forbidden('You don\'t have the privileges for this operation')
-        return rep(`${httpError}\n`)
-      }
-
-      // const user = yield userCol.findOne({ username: username })
-
-      const result = yield userCol.findOneAndDelete({ username: username })
-      console.log(result)
-
-      if (result.ok !== 1) {
-        console.log('Not Found: The user does not exist')
-        const httpError = Boom.notFound('The user does not exist')
-        return rep(`${httpError}\n`)
-      }
-
-      let response = {
-        message: `User deleted`,
-        user: username
-      }
-
-      console.log(response.message)
-      console.log('------------')
-      console.log(response.user)
-
-      response = JSON.stringify(response, null, 2)
-
-      return rep(`${response}\n`).code(200)
-    }
-    catch(e) {
-      throw e
-    }
-  }))()
-}
-
-function updateUser (req, rep) {
-  (P.coroutine(function* () {
-    try {
-      const isValidPayload = Util.validateSchema(req.payload, UserSchema.updateUser)
-
-      if (isValidPayload.error) {
-        const error = 'Invalid request payload JSON format: ' + isValidPayload.errorMsg
-        console.log('Bad Request: ', error)
-        const httpError = Boom.badRequest(error)
-        return rep(`${httpError}\n`)
-      }
-
-      const token = yield Auth.verifyToken(req, userCol)
-
-      if (token.httpError && token.httpError.isBoom) {
-        console.log(token.error)
-        return rep(`${token.httpError}\n`)
-      }
-
-      const isAdmin = token.scope ? token.scope.indexOf('admin') !== -1 : false
-
-      if (!token.isValid) {
-        console.log('Unauthorized: Wrong credentials')
-        const httpError = Boom.unauthorized('Wrong credentials')
-        return rep(`${httpError}\n`)
-      }
-
-      const username = req.params.name.toLowerCase()
-      const hasRight = isAdmin || (username === token.username)
+      const username = request.params.name.toLowerCase()
+      const isAdmin = auth.scope ? auth.scope.indexOf('admin') !== -1 : false
+      const hasRight = isAdmin || (username === auth.username)
 
       if (!hasRight) {
-        console.log('Forbidden: You don\'t have the privileges for this operation')
-        const httpError = Boom.forbidden('You don\'t have the privileges for this operation')
-        return rep(`${httpError}\n`)
+        return reply(`${Util.error('forbidden')('You don\'t have the privileges for this operation')}\n`)
       }
 
-      const data = req.payload
+      const data = request.payload
       const obj = { }
 
       const updatedUsername = data.username ? obj.username = data.username : false
@@ -287,29 +172,26 @@ function updateUser (req, rep) {
       const hasChanged = updatedUsername || updatedPassword || updatedAdmin
 
       if(!hasChanged) {
-        console.log('Unprocessable Entity: Nothing to update')
-        const httpError = Boom.badData('Nothing to update')
-        return rep(`${httpError}\n`)
+        return reply(`${Util.error('badData')('Unprocessable Entity: Nothing to update')}\n`)
       }
 
       if (updatedAdmin) {
         if(!isAdmin) {
-          console.log('Forbidden: You want to be admin? :D')
-          const httpError = Boom.forbidden('You want to be admin? :D')
-          return rep(`${httpError}\n`)
+          return reply(`${Util.error('forbidden')('You want to be admin? :D')}\n`)
         }
         obj.isAdmin = data.isAdmin
-        obj._id = Uuid.v1()
+        // obj._id = Uuid.v1()
       }
 
-      const result = yield userCol.findOneAndUpdate({ username: username },
-        { $set: obj,
+      const result = yield dbCol.findOneAndUpdate({ username: username },
+        {
+          $set: obj,
           $currentDate: { 'lastModified': true }
         })
 
       const updatedUser = Object.assign({}, result.value, obj)
 
-      let response = {
+      const response = {
         message: `User updated`,
         user: updatedUser,
         delta: obj
@@ -323,9 +205,44 @@ function updateUser (req, rep) {
       console.log('------------')
       console.log(response.obj)
 
-      response = JSON.stringify(response, null, 2)
+      return reply(`${JSON.stringify(response, null, 2)}\n`).code(200)
+    }
+    catch(e) {
+      throw e
+    }
+  }))()
+}
 
-      return rep(`${response}\n`).code(200)
+function deleteUser (request, reply) {
+  (P.coroutine(function* () {
+    try {
+      const dbCol = db.collection(Col.deleteUser)
+      const auth = request.pre.auth
+
+      const username = request.params.name.toLowerCase()
+      const isAdmin = auth.scope ? auth.scope.indexOf('admin') !== -1 : false
+      const hasRight = isAdmin || (username === auth.username)
+
+      if (!hasRight) {
+        return reply(`${Util.error('forbidden')('You don\'t have the privileges for this operation')}\n`)
+      }
+
+      const result = yield dbCol.findOneAndDelete({ username: username })
+
+      if (result.ok !== 1) {
+        return reply(`${Util.error('notFound')('The user does not exist')}\n`)
+      }
+
+      const response = {
+        message: `User deleted`,
+        user: username
+      }
+
+      console.log(response.message)
+      console.log('------------')
+      console.log(response.user)
+
+      return reply(`${JSON.stringify(response, null, 2)}\n`).code(200)
     }
     catch(e) {
       throw e
@@ -339,6 +256,6 @@ module.exports = {
   login,
   listAllUsers,
   listUser,
-  deleteUser,
-  updateUser
+  updateUser,
+  deleteUser
 }
