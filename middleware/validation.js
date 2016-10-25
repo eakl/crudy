@@ -1,14 +1,11 @@
 'use strict'
 
+const Util = require('../lib/util')
+
 function formatError (request, reply, source, error) {
-  const response = {
-    statusCode: error.output.payload.statusCode,
-    error: error.output.payload.error,
-    message: `Invalid request payload JSON format: ${error.data.details[0].message}`,
-    source: error.output.payload.validation.source
-  }
+  const response = Util.error('badRequest')(`Invalid request payload JSON format: ${error.data.details[0].message}`)
   console.log(response)
-  return reply(JSON.stringify(response, null, 2))
+  return reply(response).code(400)
 }
 
 module.exports = {

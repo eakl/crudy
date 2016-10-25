@@ -4,23 +4,20 @@ const Hapi = require('hapi')
 
 const Db = require('./lib/db')
 const Config = require('./config')
+const routes = require('./routes')
 
-Db.connect(Config.mongoUrl)
-.then(() => {
-  const routes = require('./routes')
+const server = new Hapi.Server(Config.hapiServer)
+server.connection(Config.hapiConnection)
+server.route(routes)
 
-  const server = new Hapi.Server(Config.hapiServer)
-  server.connection(Config.hapiConnection)
-  server.route(routes)
-
+if (require.main === module) {
+  Db.connect(Config.mongoUrl)
   server.start((err) => {
     if (err) {
       throw err
     }
     console.log(`Server running at: ${server.info.uri}`)
   })
-})
-.catch((e) => {
-  console.error(`${e.name}: ${e.message}`)
-  return
-})
+}
+
+module.exports = server

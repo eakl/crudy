@@ -1,5 +1,7 @@
 'use strict'
 
+const Db = require('../lib/db')
+
 const UserService = require('../services/user')
 const UserSchema = require('../schema/user')
 const ValidationErrorMiddleware = require('../middleware/validation')
@@ -24,7 +26,7 @@ module.exports = [
         failAction: ValidationErrorMiddleware.formatError
       }
     },
-    handler: UserService.signup
+    handler: Db.query(UserService.signup)
   },
 
   // Login
@@ -34,7 +36,7 @@ module.exports = [
     config: {
       pre: [ AuthMiddleware.verifyCredentials ]
     },
-    handler: UserService.login
+    handler: Db.query(UserService.login)
   },
 
   // List All Users
@@ -44,7 +46,7 @@ module.exports = [
     config: {
       pre: [ AuthMiddleware.verifyToken ]
     },
-    handler: UserService.listAllUsers
+    handler: Db.query(UserService.listAllUsers)
   },
 
   // List One User
@@ -54,7 +56,7 @@ module.exports = [
     config: {
       pre: [ AuthMiddleware.verifyToken ]
     },
-    handler: UserService.listUser
+    handler: Db.query(UserService.listUser)
   },
 
   // Update User
@@ -68,7 +70,7 @@ module.exports = [
       },
       pre: [ AuthMiddleware.verifyToken ]
     },
-    handler: UserService.updateUser
+    handler: Db.query(UserService.updateUser)
   },
 
   // Delete User
@@ -78,6 +80,6 @@ module.exports = [
     config: {
       pre: [ AuthMiddleware.verifyToken ]
     },
-    handler: UserService.deleteUser
+    handler: Db.query(UserService.deleteUser)
   }
 ]
