@@ -34,10 +34,11 @@ git clone https://github.com/eakl/tw-api
 cd tw-api
 
 # Install dependencies
-npm install
+brew update
+brew install yarn
 
 # Start the server
-npm start
+yarn
 ```
 
 ## Usage

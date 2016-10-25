@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon --ext js --watch ./ --ignore node_modules server.js",
-    "test": "tape tests/**/*.js | faucet",
+    "tests": "tape tests/**/*.js | faucet",
     "start": "node server.js"
   },
   "author": "",

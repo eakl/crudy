@@ -48,6 +48,7 @@ const mongoConnection = {
 const mongoUrl = `mongodb://${mongoConnection.host}:${mongoConnection.port}/${mongoConnection.db}`
 
 const mongoCollection = {
+  tests: 'users',
   signup: 'users',
   login: 'users',
   listAllUsers: 'users',
