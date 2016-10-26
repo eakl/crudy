@@ -6,7 +6,7 @@ Getting Started
 
 ## Prerequisite
 
-Before running the TW-API make sure that:
+Before running CRUDY make sure that:
 - You have **MongoDB** installed on your machine
 - You have **Python 2.x**
 
@@ -30,8 +30,8 @@ npm config set python /path/to/python2.7
 
 ```bash
 # Clone the repo
-git clone https://github.com/eakl/tw-api
-cd tw-api
+git clone https://github.com/eakl/crudy
+cd crudy
 
 # Install dependencies
 brew update
@@ -54,7 +54,7 @@ curl http://localhost:8080/
 Returns:
 
 ```
-Welcome to TW API v1.
+Welcome to CRUDY v1.
 ```
 
 ### Signup

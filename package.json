@@ -1,5 +1,5 @@
 {
-  "name": "tw-api",
+  "name": "crudy",
   "version": "1.0.0",
   "description": "A simple RESTful CRUD API using Node.js, Hapi, MongoDB and JWT",
   "main": "server.js",

@@ -12,7 +12,7 @@ const UserSchema = require('../schema/user')
 
 function home (request, reply) {
   const response = {
-    message: 'Welcome to TW API v1.'
+    message: 'Welcome to CRUDY v1.'
   }
 
   console.log('Home --', response.message)

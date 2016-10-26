@@ -42,7 +42,7 @@ const mongoOptions = {
 const mongoConnection = {
   host: 'localhost',
   port: '27017',
-  db: 'tw-api'
+  db: 'crudy'
 }
 
 const mongoUrl = `mongodb://${mongoConnection.host}:${mongoConnection.port}/${mongoConnection.db}`
@@ -63,7 +63,7 @@ const mongoCollection = {
 * API
 */
 
-const apiKey = 'secretkey'
+const apiKey = '69d02e9368349ab8e1c27919c850bbd'
 
 module.exports = {
   hapiServer,

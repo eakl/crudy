@@ -10,8 +10,8 @@ test('Welcome Message', (t) => {
   }
 
   server.inject(welcome, (res) => {
-    t.equal(res.result.message, 'Welcome to TW API v1.')
+    t.equal(res.result.message, 'Welcome to CRUDY v1.')
   })
-  
+
   t.end()
 })
