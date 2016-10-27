@@ -42,13 +42,14 @@ const mongoOptions = {
 const mongoConnection = {
   host: 'localhost',
   port: '27017',
-  db: 'crudy'
+  prodDb: 'crudy',
+  testDb: 'crudy_test'
 }
 
-const mongoUrl = `mongodb://${mongoConnection.host}:${mongoConnection.port}/${mongoConnection.db}`
+const mongoDb = process.env.NODE_ENV === 'test' ? mongoConnection.testDb : mongoConnection.prodDb
+const mongoUrl = `mongodb://${mongoConnection.host}:${mongoConnection.port}/${mongoDb}`
 
 const mongoCollection = {
-  tests: 'users',
   signup: 'users',
   login: 'users',
   listAllUsers: 'users',

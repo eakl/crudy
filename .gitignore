@@ -1,12 +1,18 @@
+# OSX
+.DS_Store
+*.DS_Store
+
 # Logs
 logs
 *.log
 npm-debug.log*
 
+# Lock files
+*.lock
+
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/*
 !build/index.html
-models
 
 # Dependency directories
 node_modules
@@ -16,3 +22,10 @@ node_modules
 
 # Optional REPL history
 .node_repl_history
+
+# Others
+models
+
+# Users Environment Variables
+.tmp
+.env

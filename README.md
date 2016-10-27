@@ -1,44 +1,29 @@
 A simple RESTful CRUD API
 =========================
 
-Getting Started
----------------
-
 ## Prerequisite
 
-Before running CRUDY make sure that:
-- You have **MongoDB** installed on your machine
-- You have **Python 2.x**
-
-**NOTE:** `bcrypt` uses `node-gyp` as a dependency which in turn requires Python 2.x to build.
-
-If you use Python 3.x by default, you must install **Python 2.x** in parallel and configure NPM to point towards the `python2` binary.
-
-After having cloned the repo, you can either pass the `--python` option to `npm install`:
-
-```bash
-npm install --python /path/to/python2.7
-```
-
-or configure NPM to use the `python2` binary:
-
-```bash
-npm config set python /path/to/python2.7
-```
+Before running CRUDY make sure that you have **MongoDB** installed on your machine
 
 ## Installation
 
 ```bash
+# Install Yarn
+brew update
+brew install yarn
+
 # Clone the repo
 git clone https://github.com/eakl/crudy
 cd crudy
 
 # Install dependencies
-brew update
-brew install yarn
+yarn
+
+# Run tests
+yarn test
 
 # Start the server
-yarn
+yarn start
 ```
 
 ## Usage
@@ -141,26 +126,6 @@ Returns:
 }
 ```
 
-### Delete a user
-
-Deletes a user. You can only delete yourself if you're not admin.  
-Replace *USER* and *ACCESS_TOKEN*
-
-```bash
-curl http://localhost:8080/user/USER \
--X DELETE \
--H "Authorization: ACCESS_TOKEN"
-```
-
-Returns:
-
-```
-{
-  "message": SUCCESS_MESSAGE,
-  "user": DELETED_INFO
-}
-```
-
 ### Update a user information
 
 Updates the information of a given user. You can only update your information if you're not admin.  
@@ -186,5 +151,25 @@ Returns:
   "message": SUCCESS_MESSAGE,
   "user": UPDATED_USER_INFO,
   "delta": DELTA
+}
+```
+
+### Delete a user
+
+Deletes a user. You can only delete yourself if you're not admin.  
+Replace *USER* and *ACCESS_TOKEN*
+
+```bash
+curl http://localhost:8080/user/USER \
+-X DELETE \
+-H "Authorization: ACCESS_TOKEN"
+```
+
+Returns:
+
+```
+{
+  "message": SUCCESS_MESSAGE,
+  "user": DELETED_INFO
 }
 ```

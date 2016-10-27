@@ -11,7 +11,7 @@ server.connection(Config.hapiConnection)
 server.route(routes)
 
 if (require.main === module) {
-  Db.connect(Config.mongoUrl)
+  Db.connect()
   server.start((err) => {
     if (err) {
       throw err

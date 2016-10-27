@@ -1,12 +1,12 @@
 {
   "name": "crudy",
   "version": "1.0.0",
-  "description": "A simple RESTful CRUD API using Node.js, Hapi, MongoDB and JWT",
+  "description": "A simple RESTful CRUD API using Node.js, Hapi, MongoDB, JWT and Tape",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon --ext js --watch ./ --ignore node_modules server.js",
-    "tests": "tape tests/**/*.js | faucet",
-    "start": "node server.js"
+    "dev": "NODE_ENV=test nodemon --ext js --watch ./ --ignore node_modules server.js",
+    "test": "NODE_ENV=test tape test/**/*.js | faucet",
+    "start": "NODE_ENV=production node server.js"
   },
   "author": "",
   "license": "ISC",
